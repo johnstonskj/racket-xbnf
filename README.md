@@ -4,6 +4,40 @@ Provides the ability to define a BNF in racket and emit in different syntaxes.
 
 More TBD.
 
+## Examples
+
+```racket
+(require xbnf)
+
+(grammar
+  #:comments '(
+   "Example grammar for a BNF-like syntax."
+  )
+  'bnf
+  (rule 'top (zero-or-many 'definiton))
+  (rule 'definition 'rule-name "::=" 'rule)
+  (rule 'rule 'element (zero-or-many '("|" rule)))
+  (rule 'element (choice 'token 'rule-name 'group) (optional 'repeat-operator))
+  (rule 'group "(" 'rule ")")
+  (rule 'repeat-operator (choice "?" "*" "+"))
+  (rule 'token "\"" (one-or-many 'CHAR) "\"")
+  (rule 'rule-name (one-or-many 'ALPHA) (zero-or-many (group (choice 'ALNUM #\- #\_)))))
+```
+
+```racket
+(require
+  (only-in xbnf/display disply-grammar)
+  (only-in xbnf/style style)
+  (only-in xbnf/syntax w3c-xml-syntax))
+
+(display-grammar 
+  (make-example)
+  w3c-xml-syntax
+  (style 
+    #:number-rules? #t 
+    #:align-definitions 'after-name))
+```
+
 ## License(s)
 
 The contents of this repository are made available under the following
